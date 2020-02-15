@@ -17,44 +17,8 @@
     <title>Differential Privacy</title>
   </head>
   <body style="overflow-x: hidden;">
-    <div class="row mt-5">
-      <div class="col-md-8 m-auto">
-        <div class="card card-body text-center">
-          <h1 class="text-center nodecor">
-            <i class="fas fa-braille fa-1x"></i> Differential Privacy
-          </h1>
-        </div>
-
-        <div class="card card-body">
-          <p class="lead mb-3">Dataset Loaded: <code>Adult Census Dataset</code></p>
-          <p>{{dbPreview}}</p>
-          <form action="{{ url_for('handle_submit') }}" method="POST">
-            <div class="form-group">
-              <input
-                class="form-control form-control-lg"
-                name="stdQuery"
-                type="text"
-                placeholder="Enter Standard SQL Query"
-                id="inputLarge"
-              />
-            </div>
-            <div class="form-group">
-              <input
-                class="form-control form-control-lg"
-                name="advQuery"
-                type="text"
-                placeholder="Enter Adversarial SQL Query"
-                id="inputLarge"
-              />
-            </div>
-            <button type="submit" class="btn btn-outline-primary">
-              Submit
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
+    <img src="data:image/png;base64, {{ plot_url_std }}"><br>
+    <img src="data:image/png;base64, {{ plot_url_Adv }}">
     <footer
       id="footer"
       class="py-4 bg-dark text-white"
