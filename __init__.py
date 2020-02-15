@@ -9,28 +9,29 @@ import matplotlib.pyplot as plt
 from io import StringIO
 import base64
 
+# Postgres Login Credentials
+POSTGRES_ADDRESS = '157.230.253.111'
+POSTGRES_PORT = '5432'
+POSTGRES_USERNAME = 'postgres'
+POSTGRES_PASSWORD = ''
+POSTGRES_DBNAME = 'test'
+
+# Postgres Connection String
+conn_str = ('postgresql://{username}:{password}@{ipaddress}:{port}/{dbname}'
+            .format(username=POSTGRES_USERNAME,
+                    password=POSTGRES_PASSWORD,
+                    ipaddress=POSTGRES_ADDRESS,
+                    port=POSTGRES_PORT,
+                    dbname=POSTGRES_DBNAME))
+
+# Create the connection
+psqlconn = create_engine(conn_str)
+
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    # Postgres Login Credentials
-    POSTGRES_ADDRESS = '157.230.253.111'
-    POSTGRES_PORT = '5432'
-    POSTGRES_USERNAME = 'postgres'
-    POSTGRES_PASSWORD = ''
-    POSTGRES_DBNAME = 'test'
-
-    # Postgres Connection String
-    conn_str = ('postgresql://{username}:{password}@{ipaddress}:{port}/{dbname}'
-                .format(username=POSTGRES_USERNAME,
-                        password=POSTGRES_PASSWORD,
-                        ipaddress=POSTGRES_ADDRESS,
-                        port=POSTGRES_PORT,
-                        dbname=POSTGRES_DBNAME))
-
-    # Create the connection
-    psqlconn = create_engine(conn_str)
     query = '''SELECT * FROM census LIMIT 10;'''
     queryResult = pd.read_sql_query(query, psqlconn)
     queryResult = "To display head of the table here"
