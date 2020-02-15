@@ -29,21 +29,24 @@ def index():
     queryResult = "To display head of the table here"
     return render_template('index.html', dbPreview=queryResult)
 
+
 @app.route('/handle_submit', methods=['POST'])
 def handle_submit():
-    #To handle standard query
+    # To handle standard query
     stdQuery = request.form['stdQuery']
-    stdQueryResult = pd.read_sql _query(stdQuery, psqlconn)
+    stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
 
-    #To handle adversarial query
+    # To handle adversarial query
     advQuery = request.form['advQuery']
     advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
     # Join the two Dataframes on `salary` and check the distributions
     jointData = pd.merge(stdQueryResult, advQueryResult, on='salary')
-    jointMelt = pd.melt(jointData, id_vars = "salary", var_name = "query", value_name = "count")
-    fig_std = sb.catplot(x = 'count', y = 'salary', hue = 'query', data = jointMelt, kind = 'bar', height = 10)
-    
+    jointMelt = pd.melt(jointData, id_vars="salary",
+                        var_name="query", value_name="count")
+    fig_std = sb.catplot(x='count', y='salary', hue='query',
+                         data=jointMelt, kind='bar', height=10)
+
     img_std = StringIO.StringIO()
     plt.savefig(fig_std, format='png')
     plt.close()
@@ -52,7 +55,7 @@ def handle_submit():
 
     # Join the two Dataframes on `salary` and check the difference
     jointData["difference"] = jointData["count_x"] - jointData["count_y"]
-    fig_adv = sb.barplot(x = "difference", y = "salary", data = jointData)
+    fig_adv = sb.barplot(x="difference", y="salary", data=jointData)
 
     img_adv = StringIO.StringIO()
     plt.savefig(fig_adv, format='png')
@@ -60,7 +63,8 @@ def handle_submit():
     img_adv.seek(0)
     plot_url_adv = base64.b64encode(img_adv.getvalue())
 
-    return render_template('/plots', plot_url_std = plot_url_std, plot_url_adv = plot_url_adv)
+    return render_template('/plots', plot_url_std=plot_url_std, plot_url_adv=plot_url_adv)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
