@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 from flask import Flask, render_template, redirect, request
-import urllib.parse
+from urllib import parse
 from sqlalchemy import create_engine
 import psycopg2
 import numpy as np
@@ -34,7 +35,6 @@ app = Flask(__name__)
 def index():
     query = '''SELECT * FROM census LIMIT 10;'''
     queryResult = pd.read_sql_query(query, psqlconn)
-    queryResult = "To display head of the table here"
     return render_template('index.html', dbPreview=queryResult)
 
 
