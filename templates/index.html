@@ -15,8 +15,9 @@
         text-align: center;
       }
 
-      tr:nth-child(even){background-color: #FFD5D5}
-
+      tr:nth-child(even) {
+        background-color: #ffd5d5;
+      }
     </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,9 +46,7 @@
         <div class="card card-body">
           <p class="lead mb-3">Dataset Loaded: <code>Adult Census</code></p>
           <p>
-            {% block content %}
-            {{dbPreview | safe}}
-            {% endblock %}
+            {% block content %} {{dbPreview | safe}} {% endblock %}
           </p>
           <form action="{{ url_for('handle_submit') }}" method="POST">
             <div class="form-group">
