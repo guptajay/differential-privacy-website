@@ -49,6 +49,15 @@
         </div>
 
         <div class="card card-body">
+          <form method="POST">
+            <div class="form-group">
+              <select class="custom-select">
+                <option selected="">Select a Dataset</option>
+                <option value="1">Adult Census (default)</option>
+                <option value="2">Online Retail</option>
+              </select>
+            </div>
+          </form>
           <p class="lead mb-3">Dataset Loaded: <code>Adult Census</code></p>
           <p class="lead mb-1">Dataset Preview:</p>
           <div style="overflow: auto">
@@ -56,24 +65,56 @@
               {% block content %} {{dbPreview | safe}} {% endblock %}
             </p>
           </div>
-          <form action="{{ url_for('handle_submit') }}" method="POST">
+          <form
+            action="{{ url_for('handle_submit') }}"
+            method="POST"
+            class="mt-5"
+          >
             <div class="form-group">
-              <input
+              <textarea
                 class="form-control form-control-lg"
                 name="stdQuery"
                 type="text"
                 placeholder="Enter Standard SQL Query"
                 id="inputLarge"
-              />
+                rows="3"
+                spellcheck="false"
+              ></textarea>
             </div>
             <div class="form-group">
-              <input
+              <textarea
                 class="form-control form-control-lg"
                 name="advQuery"
                 type="text"
                 placeholder="Enter Adversarial SQL Query"
                 id="inputLarge"
-              />
+                rows="3"
+                spellcheck="false"
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="stdQueryCheck"
+                  checked=""
+                />
+                <label class="custom-control-label" for="stdQueryCheck"
+                  >Standard Query</label
+                >
+              </div>
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="dpQueryCheck"
+                  checked=""
+                />
+                <label class="custom-control-label" for="dpQueryCheck"
+                  >Differentially Private Query</label
+                >
+              </div>
             </div>
             <button type="submit" class="btn btn-outline-primary">
               Submit
