@@ -39,7 +39,10 @@
 
     <title>Differential Privacy</title>
   </head>
-  <body style="overflow-x: hidden;">
+  <body
+    style="overflow-x: hidden;"
+    onload="document.getElementById('{{ dataset_name }}').selected=true"
+  >
     <div class="row mt-5">
       <div class="col-md-8 m-auto">
         <div class="card card-body text-center">
@@ -47,18 +50,33 @@
             <i class="fas fa-braille fa-1x"></i> Differential Privacy
           </h1>
         </div>
-
         <div class="card card-body">
-          <form method="POST">
+          {% if flag == 1 %}
+          <div class="alert alert-dismissible alert-success">
+            <button type="button" class="close" data-dismiss="alert">
+              &times;
+            </button>
+            Dataset changed successfully.
+          </div>
+          {% endif %}
+          <form
+            method="POST"
+            class="mb-3"
+            action="{{ url_for('change_dataset') }}"
+          >
             <div class="form-group">
-              <select class="custom-select">
-                <option selected="">Select a Dataset</option>
-                <option value="1">Adult Census (default)</option>
-                <option value="2">Online Retail</option>
+              <select class="custom-select" name="dataset" id="dataset">
+                <option id="census" value="census">Adult Census</option>
+                <option id="transactions" value="transactions"
+                  >Online Retail</option
+                >
               </select>
             </div>
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              Change Dataset
+            </button>
           </form>
-          <p class="lead mb-3">Dataset Loaded: <code>Adult Census</code></p>
+          <p class="lead mb-3">Table Loaded: <code>{{ dataset_name }}</code></p>
           <p class="lead mb-1">Dataset Preview:</p>
           <div style="overflow: auto">
             <p>
@@ -134,9 +152,9 @@
       function showHideDivAdv(chkPassport) {
         var dvPassport = document.getElementById("adv");
         dvPassport.style.display = chkPassport.checked ? "block" : "none";
-    }
+      }
     </script>
-    
+
     <script
       src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"

@@ -42,7 +42,15 @@ app = Flask(__name__)
 def index():
     query = '''SELECT * FROM census LIMIT 10;'''
     queryResult = pd.read_sql_query(query, psqlconn)
-    return render_template('index.html', dbPreview=queryResult.to_html())
+    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name="census", flag=0)
+
+
+@app.route('/change_dataset', methods=['POST'])
+def change_dataset():
+    dataset_name = request.form['dataset']
+    query = '''SELECT * FROM ''' + dataset_name + ''' LIMIT 10;'''
+    queryResult = pd.read_sql_query(query, psqlconn)
+    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name=dataset_name, flag=1)
 
 
 @app.route('/handle_submit', methods=['POST'])
@@ -55,7 +63,7 @@ def handle_submit():
     advQuery = request.form['advQuery']
     advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
-    fig, axs = plt.subplots(2,1, figsize=(12,8))
+    fig, axs = plt.subplots(2, 1, figsize=(12, 8))
 
     # Join the two Dataframes on `salary` and check the distributions
     jointData = pd.merge(stdQueryResult, advQueryResult, on='salary')
@@ -72,8 +80,8 @@ def handle_submit():
     pngImageB64String = "data:image/png;base64,"
     pngImageB64String += base64.b64encode(output.getvalue()).decode('utf8')
 
+    return render_template('plots.html', plot_url=pngImageB64String, stdQuery=stdQuery, advQuery=advQuery)
 
-    return render_template('plots.html',plot_url = pngImageB64String, stdQuery=stdQuery, advQuery=advQuery)
 
 if __name__ == "__main__":
     app.run(debug=True)
