@@ -55,7 +55,7 @@ def handle_submit():
     advQuery = request.form['advQuery']
     advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
-    fig, axs = plt.subplots(1,2, figsize=(12,6))
+    fig, axs = plt.subplots(2,1, figsize=(12,8))
 
     # Join the two Dataframes on `salary` and check the distributions
     jointData = pd.merge(stdQueryResult, advQueryResult, on='salary')
@@ -73,7 +73,7 @@ def handle_submit():
     pngImageB64String += base64.b64encode(output.getvalue()).decode('utf8')
 
 
-    return render_template('plots.html',plot_url = pngImageB64String)
+    return render_template('plots.html',plot_url = pngImageB64String, stdQuery=stdQuery, advQuery=advQuery)
 
 if __name__ == "__main__":
     app.run(debug=True)
