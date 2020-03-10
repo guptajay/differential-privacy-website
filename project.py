@@ -7,8 +7,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sb
 import matplotlib.pyplot as plt
-from io import StringIO
+import io
 import base64
+from flask import Response
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 # Postgres Login Credentials
 POSTGRES_ADDRESS = '157.230.253.111'
@@ -28,6 +31,10 @@ conn_str = ('postgresql://{username}:{password}@{ipaddress}:{port}/{dbname}'
 # Create the connection
 psqlconn = create_engine(conn_str)
 
+# Global Variables
+stdQuery = ''
+advQuery = ''
+
 app = Flask(__name__)
 
 
@@ -43,36 +50,30 @@ def handle_submit():
     # To handle standard query
     stdQuery = request.form['stdQuery']
     stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
-    
 
     # To handle adversarial query
     advQuery = request.form['advQuery']
     advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
+    fig, axs = plt.subplots(1,2, figsize=(12,6))
+
     # Join the two Dataframes on `salary` and check the distributions
     jointData = pd.merge(stdQueryResult, advQueryResult, on='salary')
     jointMelt = pd.melt(jointData, id_vars="salary",
                         var_name="query", value_name="count")
-    sb.catplot(x='count', y='salary', hue='query', data=jointMelt, kind='bar', height=10)
-
-    img_std = StringIO()
-    plt.savefig(img_std, format='png')
-    plt.close()
-    img_std.seek(0)
-    plot_url_std = base64.b64encode(img_std.getvalue())
+    axs[0].bar(jointMelt['salary'], jointMelt['count'])
 
     # Join the two Dataframes on `salary` and check the difference
     jointData["difference"] = jointData["count_x"] - jointData["count_y"]
-    sb.barplot(x="difference", y="salary", data=jointData)
+    axs[1].bar(jointData['salary'], jointData['difference'])
 
-    img_adv = StringIO()
-    plt.savefig(img_adv, format='png')
-    plt.close()
-    img_adv.seek(0)
-    plot_url_adv = base64.b64encode(img_adv.getvalue())
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    pngImageB64String = "data:image/png;base64,"
+    pngImageB64String += base64.b64encode(output.getvalue()).decode('utf8')
 
-    return render_template('plots.html', plot_url_std=plot_url_std, plot_url_adv=plot_url_adv)
 
+    return render_template('plots.html',plot_url = pngImageB64String)
 
 if __name__ == "__main__":
     app.run(debug=True)
