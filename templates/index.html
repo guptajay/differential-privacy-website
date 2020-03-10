@@ -94,7 +94,7 @@
                 name="stdQuery"
                 type="text"
                 placeholder="Enter Standard SQL Query"
-                id="inputLarge"
+                id="inputLargeStd"
                 rows="3"
                 spellcheck="false"
               ></textarea>
@@ -105,7 +105,7 @@
                 name="advQuery"
                 type="text"
                 placeholder="Enter Adversarial SQL Query"
-                id="inputLarge"
+                id="inputLargeAdv"
                 rows="3"
                 spellcheck="false"
               ></textarea>
@@ -147,11 +147,15 @@
     <script>
       function showHideDivStd(chkPassport) {
         var dvPassport = document.getElementById("std");
+        var dvPassport1 = document.getElementById("inputLargeStd");
         dvPassport.style.display = chkPassport.checked ? "block" : "none";
+        dvPassport1.value = "";
       }
       function showHideDivAdv(chkPassport) {
         var dvPassport = document.getElementById("adv");
+        var dvPassport1 = document.getElementById("inputLargeAdv");
         dvPassport.style.display = chkPassport.checked ? "block" : "none";
+        dvPassport1.value = "";
       }
     </script>
 

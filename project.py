@@ -57,24 +57,44 @@ def change_dataset():
 def handle_submit():
     # To handle standard query
     stdQuery = request.form['stdQuery']
-    stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
 
     # To handle adversarial query
     advQuery = request.form['advQuery']
-    advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
-    fig, axs = plt.subplots(2, 1, figsize=(12, 8))
+    # If only advQuery
+    if(len(stdQuery) <= 1 and len(advQuery) > 1):
+        advQueryResult = pd.read_sql_query(advQuery, psqlconn)
+        fig, axs = plt.subplots(1,1, figsize=(15,5))
+        axs.bar(advQueryResult['salary'], advQueryResult['count'])
+        axs.set_title('Adversarial Query')
+    
+    # If both are present
+    elif(len(stdQuery) > 1 and len(advQuery) > 1):
+        stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
+        advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
-    # Join the two Dataframes on `salary` and check the distributions
-    jointData = pd.merge(stdQueryResult, advQueryResult, on='salary')
-    jointMelt = pd.melt(jointData, id_vars="salary",
-                        var_name="query", value_name="count")
-    axs[0].bar(jointMelt['salary'], jointMelt['count'])
+        fig, axs = plt.subplots(3,1, figsize=(15,15))
+        axs[0].bar(stdQueryResult['salary'], stdQueryResult['count'])
+        axs[0].set_title('Standard Query')
+        axs[1].bar(advQueryResult['salary'], advQueryResult['count'])
+        axs[1].set_title('Adversarial Query')
 
-    # Join the two Dataframes on `salary` and check the difference
-    jointData["difference"] = jointData["count_x"] - jointData["count_y"]
-    axs[1].bar(jointData['salary'], jointData['difference'])
+        # Join the two Dataframes on `salary` and check the distributions
+        jointData = pd.merge(stdQueryResult, advQueryResult, on='salary')
 
+        # Join the two Dataframes on `salary` and check the difference
+        jointData["difference"] = jointData["count_x"] - jointData["count_y"]
+        axs[2].bar(jointData['salary'], jointData['difference'])
+        axs[2].set_title('Difference')
+    
+    # If only standard query
+    else:
+        stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
+        fig, axs = plt.subplots(1,1, figsize=(15,5))
+        axs.bar(stdQueryResult['salary'], stdQueryResult['count'])
+        axs.set_title('Standard Query')
+
+    fig.tight_layout()
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     pngImageB64String = "data:image/png;base64,"
