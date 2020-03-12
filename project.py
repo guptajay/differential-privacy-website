@@ -55,6 +55,12 @@ def change_dataset():
     return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name=dataset_name, flag=1, columns=list(queryResult))
 
 
+@app.route('/generate_graphs', methods=['POST'])
+def generate_graphs():
+    # To handle
+    hiRitik = 'complete the code from here'
+
+
 @app.route('/handle_submit', methods=['POST'])
 def handle_submit():
     # To handle standard query
