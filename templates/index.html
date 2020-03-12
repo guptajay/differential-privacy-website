@@ -3,9 +3,9 @@
   <head>
     <style>
       table {
-        border-collapse: collapse;
+        border-collapse: collapse !important;
         width: 100%;
-        background-color: white;
+        background-color: white !important;
       }
 
       tr:hover {
@@ -80,9 +80,282 @@
           <p class="lead mb-1">Dataset Preview:</p>
           <div style="overflow: auto">
             <p>
+              <div class="dataset-table">
               {% block content %} {{dbPreview | safe}} {% endblock %}
+              </div>
             </p>
           </div>
+          <h3 class="mt-5 mb-3">SQL Query Builder</h3>
+          <form action="{{ url_for('handle_submit') }}" method="POST">
+          <div class="form-group">
+            <div class="custom-control custom-switch mt-3">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                id="customSwitch1"
+              />
+              <label class="custom-control-label" for="customSwitch1"
+                >Differentialy Private Query</label
+              >
+            </div>
+          </div>
+<style>
+#nostyle tr:hover {
+        background-color: #ffffff !important;
+      }
+
+#nostyle tr:nth-child(even) {
+        background-color: #ffffff !important;
+      }
+</style>
+          <div class="form-group">
+            <h4 class="mt-4">Query 1</h4>
+              <table class="table table-hover" id="nostyle">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="disabledInput"
+                          type="text"
+                          placeholder="SELECT"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col">
+                      <select class="custom-select" id="aggregate_column" onchange="match_column()">
+                      {% block column_names %}
+                      {% for val in columns %}
+                         <option value = "{{ val }}"> {{ val }} </option>
+                      {% endfor %}
+                   {% endblock %}
+                      </select>
+                    </th>
+                    <th scope="col">
+                      <select class="custom-select" id="aggregate_function" onchange="match_column()">
+                        <option value="COUNT">COUNT</option>
+                        <option value="SUM">SUM</option>
+                      </select>
+                    </th>
+                    <th scope="col"><h2>(</h2></th>
+                    <th scope="col">
+                      <select class="custom-select" id="aggregate_value" onchange="match_column()">
+                        {% block column_names_1 %}
+                        {% for val in columns %}
+                           <option value = "{{ val }}"> {{ val }} </option>
+                        {% endfor %}
+                     {% endblock %}
+                        </select>
+                    </th>
+                    <th scope="col"><h2>)</h2></th>
+                  </tr>
+                  <th scope="col">
+                    <fieldset disabled="">
+                      <input
+                        class="form-control"
+                        id="disabledInput"
+                        type="text"
+                        placeholder="FROM"
+                        disabled=""
+                      />
+                    </fieldset>
+                  </th>
+                  <th scope="col">
+                    <fieldset disabled="">
+                      <input
+                        class="form-control"
+                        id="disabledInput"
+                        type="text"
+                        placeholder="{{ dataset_name }}"
+                        disabled=""
+                      />
+                    </fieldset>
+                  </th>
+                  <tr>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="disabledInput"
+                          type="text"
+                          placeholder="GROUP BY"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="group_by_column"
+                          type="text"
+                          placeholder=""
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="anotherSQL"
+                  checked=""
+                  onclick="showHideDivSQL(this)"
+                />
+                <label class="custom-control-label" for="anotherSQL"
+                  >Add Another SQL Query</label
+                >
+              </div>
+
+
+          <div class="form-group" id="second_query">
+            <h4 class="mt-4">Query 2</h4>
+              <table class="table table-hover" id="nostyle">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="disabledInput"
+                          type="text"
+                          placeholder="SELECT"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="second_sql_select"
+                          type="text"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="second_sql_function"
+                          type="text"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col"><h2>(</h2></th>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="second_sql_aggr_value"
+                          type="text"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col"><h2>)</h2></th>
+                  </tr>
+                  <tr>
+                  <th scope="col">
+                    <fieldset disabled="">
+                      <input
+                        class="form-control"
+                        id="disabledInput"
+                        type="text"
+                        placeholder="FROM"
+                        disabled=""
+                      />
+                    </fieldset>
+                  </th>
+                  <th scope="col">
+                    <fieldset disabled="">
+                      <input
+                        class="form-control"
+                        id="disabledInput"
+                        type="text"
+                        placeholder="{{ dataset_name }}"
+                        disabled=""
+                      />
+                    </fieldset>
+                  </th>
+                </tr>
+
+                <tr>
+
+                  <th scope="col">
+                    <fieldset disabled="">
+                      <input
+                        class="form-control"
+                        id="disabledInput"
+                        type="text"
+                        placeholder="WHERE"
+                        disabled=""
+                      />
+                    </fieldset>
+                  </th>
+
+                  <th scope="col">
+                    <select class="custom-select">
+                      {% block query_2 %}
+                      {% for val in columns %}
+                         <option value = "{{ val }}"> {{ val }} </option>
+                      {% endfor %}
+                   {% endblock %}
+                      </select>
+                  </th>
+
+                  <th scope="col">
+                    <h2 style="text-align: center;">=</h2>
+                  </th>
+                  <th scope="col">
+
+                  </th>
+                  <th scope="col">
+                    <input type="text" class="form-control" placeholder="Input" id="inputDefault">
+                  </th>
+                </tr>
+                  <tr>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="disabledInput"
+                          type="text"
+                          placeholder="GROUP BY"
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                    <th scope="col">
+                      <fieldset disabled="">
+                        <input
+                          class="form-control"
+                          id="group_by_column_query2"
+                          type="text"
+                          placeholder=""
+                          disabled=""
+                        />
+                      </fieldset>
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline-primary">
+            Submit
+          </button>
+            </form>
+          </div>
+<!--
           <form
             action="{{ url_for('handle_submit') }}"
             method="POST"
@@ -140,6 +413,8 @@
               Submit
             </button>
           </form>
+
+        -->
         </div>
       </div>
     </div>
@@ -156,6 +431,26 @@
         var dvPassport1 = document.getElementById("inputLargeAdv");
         dvPassport.style.display = chkPassport.checked ? "block" : "none";
         dvPassport1.value = "";
+      }
+
+      function match_column() 
+      {
+          aggr = document.getElementById('aggregate_column')
+          document.getElementById('group_by_column').value = aggr.options[aggr.selectedIndex].value; 
+          document.getElementById('group_by_column_query2').value = aggr.options[aggr.selectedIndex].value; 
+          document.getElementById('second_sql_select').value = aggr.options[aggr.selectedIndex].value; 
+
+          aggr_func = document.getElementById('aggregate_function')
+          document.getElementById('second_sql_function').value = aggr_func.options[aggr_func.selectedIndex].value; 
+
+          aggr_func_value = document.getElementById('aggregate_value')
+          document.getElementById('second_sql_aggr_value').value = aggr_func_value.options[aggr_func_value.selectedIndex].value; 
+      }
+
+      function showHideDivSQL(chkPassport) {
+        var dvPassport = document.getElementById("second_query");
+        var dvPassport1 = document.getElementById("anotherSQL");
+        dvPassport.style.display = chkPassport.checked ? "block" : "none";
       }
     </script>
 

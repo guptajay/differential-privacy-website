@@ -42,7 +42,8 @@ app = Flask(__name__)
 def index():
     query = '''SELECT * FROM census LIMIT 10;'''
     queryResult = pd.read_sql_query(query, psqlconn)
-    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name="census", flag=0)
+    columns = list(queryResult)
+    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name="census", flag=0, columns=columns)
 
 
 @app.route('/change_dataset', methods=['POST'])
@@ -50,7 +51,8 @@ def change_dataset():
     dataset_name = request.form['dataset']
     query = '''SELECT * FROM ''' + dataset_name + ''' LIMIT 10;'''
     queryResult = pd.read_sql_query(query, psqlconn)
-    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name=dataset_name, flag=1)
+    columns = list(queryResult)
+    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name=dataset_name, flag=1, columns=list(queryResult))
 
 
 @app.route('/handle_submit', methods=['POST'])
@@ -64,16 +66,16 @@ def handle_submit():
     # If only advQuery
     if(len(stdQuery) <= 1 and len(advQuery) > 1):
         advQueryResult = pd.read_sql_query(advQuery, psqlconn)
-        fig, axs = plt.subplots(1,1, figsize=(15,5))
+        fig, axs = plt.subplots(1, 1, figsize=(15, 5))
         axs.bar(advQueryResult['salary'], advQueryResult['count'])
         axs.set_title('Adversarial Query')
-    
+
     # If both are present
     elif(len(stdQuery) > 1 and len(advQuery) > 1):
         stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
         advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
-        fig, axs = plt.subplots(3,1, figsize=(15,15))
+        fig, axs = plt.subplots(3, 1, figsize=(15, 15))
         axs[0].bar(stdQueryResult['salary'], stdQueryResult['count'])
         axs[0].set_title('Standard Query')
         axs[1].bar(advQueryResult['salary'], advQueryResult['count'])
@@ -86,11 +88,11 @@ def handle_submit():
         jointData["difference"] = jointData["count_x"] - jointData["count_y"]
         axs[2].bar(jointData['salary'], jointData['difference'])
         axs[2].set_title('Difference')
-    
+
     # If only standard query
     else:
         stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
-        fig, axs = plt.subplots(1,1, figsize=(15,5))
+        fig, axs = plt.subplots(1, 1, figsize=(15, 5))
         axs.bar(stdQueryResult['salary'], stdQueryResult['count'])
         axs.set_title('Standard Query')
 
