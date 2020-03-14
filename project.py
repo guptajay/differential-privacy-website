@@ -57,9 +57,41 @@ def change_dataset():
 
 @app.route('/generate_graphs', methods=['POST'])
 def generate_graphs():
-    # To handle
-    hiRitik = 'complete the code from here'
 
+    dataset = request.form['dataset']
+    col1 = request.form['stdQueryCol1']
+    col2 = request.form['stdQueryCol2']
+    func = request.form['stdQueryFunc']
+    column=func.lower()
+
+    # To handle
+    stdQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' GROUP BY '+col1
+    advQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' WHERE '+col2+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
+
+    stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
+    advQueryResult = pd.read_sql_query(advQuery, psqlconn)
+
+    fig, axs = plt.subplots(3, 1, figsize=(15, 15))
+    axs[0].bar(stdQueryResult[col1], stdQueryResult[column])
+    axs[0].set_title('Standard Query')
+    axs[1].bar(advQueryResult[col1], advQueryResult[column])
+    axs[1].set_title('Adversarial Query')
+
+    # Join the two Dataframes on `salary` and check the distributions
+    jointData = pd.merge(stdQueryResult, advQueryResult, on=col1)
+
+    # Join the two Dataframes on `salary` and check the difference
+    jointData["difference"] = jointData[column+"_x"] - jointData[column+"_y"]
+    axs[2].bar(jointData[col1], jointData['difference'])
+    axs[2].set_title('Difference')
+
+    fig.tight_layout()
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    pngImageB64String = "data:image/png;base64,"
+    pngImageB64String += base64.b64encode(output.getvalue()).decode('utf8')
+
+    return render_template('plots.html', plot_url=pngImageB64String, stdQuery=stdQuery, advQuery=advQuery)
 
 @app.route('/handle_submit', methods=['POST'])
 def handle_submit():

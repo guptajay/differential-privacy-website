@@ -62,7 +62,7 @@
           <form
             method="POST"
             class="mb-3"
-            action="{{ url_for('generate_graphs') }}"
+            action="{{ url_for('change_dataset') }}"
           >
             <div class="form-group">
               <select class="custom-select" name="dataset" id="dataset">
@@ -86,13 +86,15 @@
             </p>
           </div>
           <h3 class="mt-5 mb-3">SQL Query Builder</h3>
-          <form action="{{ url_for('handle_submit') }}" method="POST">
+          <form action="{{ url_for('generate_graphs') }}" method="POST">
           <div class="form-group">
             <div class="custom-control custom-switch mt-3">
+              <input type="hidden" name="dataset" value="{{ dataset_name }}" />
               <input
                 type="checkbox"
                 class="custom-control-input"
                 id="customSwitch1"
+                onclick="document.getElementById('count').value=(document.getElementById('count').value == 'COUNT')?'ANON_COUNT':'COUNT';document.getElementById('sum').value=(document.getElementById('sum').value == 'SUM')?'ANON_SUM':'SUM'"
               />
               <label class="custom-control-label" for="customSwitch1"
                 >Differentialy Private Query</label
@@ -125,7 +127,7 @@
                       </fieldset>
                     </th>
                     <th scope="col">
-                      <select class="custom-select" id="aggregate_column" onchange="match_column()">
+                      <select name="stdQueryCol1" class="custom-select" id="aggregate_column" onchange="match_column()">
                       {% block column_names %}
                       {% for val in columns %}
                          <option value = "{{ val }}"> {{ val }} </option>
@@ -134,14 +136,14 @@
                       </select>
                     </th>
                     <th scope="col">
-                      <select class="custom-select" id="aggregate_function" onchange="match_column()">
-                        <option value="COUNT">COUNT</option>
-                        <option value="SUM">SUM</option>
+                      <select name="stdQueryFunc" class="custom-select" id="aggregate_function" onchange="match_column()">
+                        <option id="count" value="COUNT">COUNT</option>
+                        <option id="sum" value="SUM">SUM</option>
                       </select>
                     </th>
                     <th scope="col"><h2>(</h2></th>
                     <th scope="col">
-                      <select class="custom-select" id="aggregate_value" onchange="match_column()">
+                      <select name="stdQueryCol2" class="custom-select" id="aggregate_value" onchange="match_column()">
                         {% block column_names_1 %}
                         {% for val in columns %}
                            <option value = "{{ val }}"> {{ val }} </option>
@@ -313,13 +315,13 @@
                   </th>
 
                   <th scope="col">
-                    <h2 style="text-align: center;">=</h2>
+                    <h2 style="text-align: center;">!=</h2>
                   </th>
                   <th scope="col">
 
                   </th>
                   <th scope="col">
-                    <input type="text" class="form-control" placeholder="Input" id="inputDefault">
+                    <input name="advQueryCondition" type="text" class="form-control" placeholder="Input" id="inputDefault">
                   </th>
                 </tr>
                   <tr>
@@ -441,7 +443,13 @@
           document.getElementById('second_sql_select').value = aggr.options[aggr.selectedIndex].value; 
 
           aggr_func = document.getElementById('aggregate_function')
-          document.getElementById('second_sql_function').value = aggr_func.options[aggr_func.selectedIndex].value; 
+          document.getElementById('second_sql_function').value = aggr_func.options[aggr_func.selectedIndex].value;
+          if(document.getElementById('second_sql_function').value == 'ANON_COUNT'){
+            document.getElementById('second_sql_function').value = "COUNT"
+          }
+          if(document.getElementById('second_sql_function').value == 'ANON_SUM'){
+            document.getElementById('second_sql_function').value = "SUM"
+          }
 
           aggr_func_value = document.getElementById('aggregate_value')
           document.getElementById('second_sql_aggr_value').value = aggr_func_value.options[aggr_func_value.selectedIndex].value; 
