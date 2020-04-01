@@ -61,6 +61,7 @@ def generate_graphs():
     dataset = request.form['dataset']
     col1 = request.form['stdQueryCol1']
     col2 = request.form['stdQueryCol2']
+    whereClause = request.form['advQueryWhere']
     func = request.form['stdQueryFunc']
     column = func.lower()
 
@@ -68,7 +69,7 @@ def generate_graphs():
     stdQuery = 'SELECT '+col1+','+func + \
         '('+col2+') FROM '+dataset+' GROUP BY '+col1
     advQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' WHERE ' + \
-        col2+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
+        whereClause+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
 
     stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
     advQueryResult = pd.read_sql_query(advQuery, psqlconn)
