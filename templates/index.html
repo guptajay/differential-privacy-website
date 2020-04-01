@@ -66,7 +66,7 @@
           >
             <div class="form-group">
               <select class="custom-select" name="dataset" id="dataset">
-                <option id="census" value="census">Adult Census</option>
+                <option id="census_new" value="census_new">Adult Census</option>
                 <option id="transactions" value="transactions"
                   >Online Retail</option
                 >
@@ -128,7 +128,8 @@
                     </th>
                     <th scope="col">
                       <select name="stdQueryCol1" class="custom-select" id="aggregate_column" onchange="match_column()">
-                      {% block column_names %}
+                       
+                        {% block column_names %}
                       {% for val in columns %}
                          <option value = "{{ val }}"> {{ val }} </option>
                       {% endfor %}
@@ -141,9 +142,10 @@
                         <option id="sum" value="SUM">SUM</option>
                       </select>
                     </th>
-                    <th scope="col"><h2>(</h2></th>
+                    
                     <th scope="col">
                       <select name="stdQueryCol2" class="custom-select" id="aggregate_value" onchange="match_column()">
+                        <option value = "*">*</option>
                         {% block column_names_1 %}
                         {% for val in columns %}
                            <option value = "{{ val }}"> {{ val }} </option>
@@ -151,7 +153,7 @@
                      {% endblock %}
                         </select>
                     </th>
-                    <th scope="col"><h2>)</h2></th>
+                    
                   </tr>
                   <th scope="col">
                     <fieldset disabled="">

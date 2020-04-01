@@ -40,10 +40,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    query = '''SELECT * FROM census LIMIT 10;'''
+    query = '''SELECT * FROM census_new LIMIT 10;'''
     queryResult = pd.read_sql_query(query, psqlconn)
     columns = list(queryResult)
-    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name="census", flag=0, columns=columns)
+    return render_template('index.html', dbPreview=queryResult.to_html(), dataset_name="census_new", flag=0, columns=columns)
 
 
 @app.route('/change_dataset', methods=['POST'])
@@ -62,11 +62,13 @@ def generate_graphs():
     col1 = request.form['stdQueryCol1']
     col2 = request.form['stdQueryCol2']
     func = request.form['stdQueryFunc']
-    column=func.lower()
+    column = func.lower()
 
     # To handle
-    stdQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' GROUP BY '+col1
-    advQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' WHERE '+col2+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
+    stdQuery = 'SELECT '+col1+','+func + \
+        '('+col2+') FROM '+dataset+' GROUP BY '+col1
+    advQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' WHERE ' + \
+        col2+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
 
     stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
     advQueryResult = pd.read_sql_query(advQuery, psqlconn)
@@ -92,6 +94,7 @@ def generate_graphs():
     pngImageB64String += base64.b64encode(output.getvalue()).decode('utf8')
 
     return render_template('plots.html', plot_url=pngImageB64String, stdQuery=stdQuery, advQuery=advQuery)
+
 
 @app.route('/handle_submit', methods=['POST'])
 def handle_submit():
