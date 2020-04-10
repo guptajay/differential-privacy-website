@@ -68,25 +68,34 @@ def generate_graphs():
     # To handle
     stdQuery = 'SELECT '+col1+','+func + \
         '('+col2+') FROM '+dataset+' GROUP BY '+col1
-    advQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' WHERE ' + \
-        whereClause+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
 
     stdQueryResult = pd.read_sql_query(stdQuery, psqlconn)
-    advQueryResult = pd.read_sql_query(advQuery, psqlconn)
+    
+    fig = ''
+    advQuery = 'Not Applicable'
 
-    fig, axs = plt.subplots(3, 1, figsize=(15, 15))
-    axs[0].bar(stdQueryResult[col1], stdQueryResult[column])
-    axs[0].set_title('Standard Query')
-    axs[1].bar(advQueryResult[col1], advQueryResult[column])
-    axs[1].set_title('Adversarial Query')
+    if(request.form.get('anotherQuery')):
+        advQuery = 'SELECT '+col1+','+func+'('+col2+') FROM '+dataset+' WHERE ' + \
+            whereClause+'!='+"'"+request.form['advQueryCondition']+"'"+' GROUP BY '+col1
+        advQueryResult = pd.read_sql_query(advQuery, psqlconn)
 
-    # Join the two Dataframes on `salary` and check the distributions
-    jointData = pd.merge(stdQueryResult, advQueryResult, on=col1)
+        fig, axs = plt.subplots(3, 1, figsize=(15, 15))
+        axs[0].bar(stdQueryResult[col1], stdQueryResult[column])
+        axs[0].set_title('Standard Query')
+        axs[1].bar(advQueryResult[col1], advQueryResult[column])
+        axs[1].set_title('Adversarial Query')
 
-    # Join the two Dataframes on `salary` and check the difference
-    jointData["difference"] = jointData[column+"_x"] - jointData[column+"_y"]
-    axs[2].bar(jointData[col1], jointData['difference'])
-    axs[2].set_title('Difference')
+        # Join the two Dataframes on `salary` and check the distributions
+        jointData = pd.merge(stdQueryResult, advQueryResult, on=col1)
+
+        # Join the two Dataframes on `salary` and check the difference
+        jointData["difference"] = jointData[column+"_x"] - jointData[column+"_y"]
+        axs[2].bar(jointData[col1], jointData['difference'])
+        axs[2].set_title('Difference')
+    else:
+        fig, axs = plt.subplots(1, 1, figsize=(8, 8))
+        axs.bar(stdQueryResult[col1], stdQueryResult[column])
+        axs.set_title('Standard Query')
 
     fig.tight_layout()
     output = io.BytesIO()
